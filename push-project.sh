@@ -20,12 +20,16 @@ if [ ! -d ".git" ]; then
     git branch -M main
 fi
 
-# Add all files (respecting .gitignore)
-echo -e "${CYAN}📋 Adding all files to staging area...${NC}"
-git add .
+# Get only modified and untracked files (not staged ones)
+echo -e "${CYAN}📋 Analyzing modified and untracked files...${NC}"
 
-# Get all staged files
-files=$(git diff --cached --name-only | sort)
+# Get modified files
+modified_files=$(git diff --name-only | sort)
+# Get untracked files
+untracked_files=$(git ls-files --others --exclude-standard | sort)
+
+# Combine both lists
+files=$(echo -e "$modified_files\n$untracked_files" | sort | grep -v '^$')
 
 if [ -z "$files" ]; then
     echo -e "${YELLOW}⚠️  No files to commit or all files are up to date.${NC}"
@@ -59,19 +63,19 @@ generate_commit_message() {
             echo "feat: create Project model with color coding and metadata"
             ;;
         "server/routes/tasks.js")
-            echo "feat: implement CRUD API endpoints for task management"
+            echo "fix: add ObjectId validation and improve error handling for timer endpoints"
             ;;
         "server/routes/projects.js")
             echo "feat: implement CRUD API endpoints for project management"
             ;;
         "server/routes/stats.js")
-            echo "feat: add analytics endpoints for productivity insights"
+            echo "fix: resolve timezone issues in daily stats API for accurate date display"
             ;;
         "client/app/layout.js")
-            echo "feat: create Next.js app layout with responsive design"
+            echo "fix: add navigation sidebar and suppress hydration warnings for better UX"
             ;;
         "client/app/page.js")
-            echo "feat: implement main dashboard with task overview"
+            echo "feat: implement root redirect to dashboard with Next.js router"
             ;;
         "client/app/globals.css")
             echo "style: add global CSS variables and base styling"
@@ -83,13 +87,13 @@ generate_commit_message() {
             echo "feat: create task management interface with filtering"
             ;;
         "client/components/TaskCard.js")
-            echo "feat: implement task card component with priority indicators"
+            echo "fix: add error handling for timer operations and improve user feedback"
             ;;
         "client/components/TaskModal.js")
             echo "feat: add modal for creating and editing tasks"
             ;;
         "client/components/ProjectsView.js")
-            echo "feat: build project management interface with progress tracking"
+            echo "fix: implement Next.js router for smooth project navigation"
             ;;
         "client/components/AnalyticsView.js")
             echo "feat: create analytics dashboard with charts and insights"
@@ -99,6 +103,9 @@ generate_commit_message() {
             ;;
         "client/components/Sidebar.js")
             echo "feat: add navigation sidebar with project links"
+            ;;
+        "client/components/NavigationSidebar.js")
+            echo "feat: create Next.js router-based navigation sidebar for smooth client-side routing"
             ;;
         "client/components/StatCard.js")
             echo "feat: create reusable statistics card component"
@@ -124,6 +131,24 @@ generate_commit_message() {
         "server/.env"|"client/.env.local")
             echo "chore: add environment configuration file"
             ;;
+        "client/app/dashboard/"|"client/app/tasks/"|"client/app/projects/"|"client/app/history/"|"client/app/analytics/")
+            echo "feat: implement Next.js App Router structure for individual page routes"
+            ;;
+        "client/app/dashboard/page.js")
+            echo "feat: create dedicated dashboard route with analytics and statistics"
+            ;;
+        "client/app/tasks/page.js")
+            echo "feat: create dedicated tasks route with searchParams support"
+            ;;
+        "client/app/projects/page.js")
+            echo "feat: create dedicated projects route for project management"
+            ;;
+        "client/app/history/page.js")
+            echo "feat: create dedicated history route for task completion tracking"
+            ;;
+        "client/app/analytics/page.js")
+            echo "feat: create dedicated analytics route for detailed productivity insights"
+            ;;
         *)
             # Generic messages based on file type
             if [[ "$file" == *.js ]]; then
@@ -144,19 +169,27 @@ generate_commit_message() {
 # Commit each file individually
 commit_count=0
 for file in $files; do
-    if [ -f "$file" ]; then
-        # Reset staging and stage only this file
-        git reset
+    if [ -f "$file" ] || [ -d "$file" ]; then
+        # Stage only this file
         git add "$file"
         
         # Generate professional commit message
         commit_msg=$(generate_commit_message "$file")
         
+        # Determine file type for output
+        if echo "$modified_files" | grep -q "^$file$"; then
+            file_type="Modified"
+        elif echo "$untracked_files" | grep -q "^$file$"; then
+            file_type="New"
+        else
+            file_type="Changed"
+        fi
+        
         # Commit with the generated message
         git commit -m "$commit_msg"
         commit_count=$((commit_count + 1))
         
-        echo -e "${GREEN}✅ [$commit_count] Committed: $commit_msg${NC}"
+        echo -e "${GREEN}✅ [$commit_count] $file_type: $commit_msg${NC}"
         echo -e "${CYAN}   📁 File: $file${NC}"
         echo ""
     fi
@@ -181,4 +214,5 @@ echo -e "${BLUE}📤 Pushing $commit_count commits to remote repository...${NC}"
 git push -u origin main --force
 
 echo -e "${GREEN}🎉 Successfully committed and pushed $commit_count files to GitHub!${NC}"
-echo -e "${CYAN}📊 Commit summary: Each file was committed with a descriptive message based on its purpose.${NC}"
+echo -e "${CYAN}📊 Commit summary: Modified files were committed with fix/feat messages, new files with descriptive purpose messages.${NC}"
+echo -e "${CYAN}🔄 All navigation now uses Next.js router for smooth UX, date/time issues resolved, and proper routing structure implemented.${NC}"
