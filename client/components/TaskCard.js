@@ -25,6 +25,9 @@ export default function TaskCard({ task, onUpdate, onDelete, compact = false }) 
     try {
       const updated = task.timerRunning ? await stopTimer(task._id) : await startTimer(task._id);
       onUpdate(updated);
+    } catch (error) {
+      console.error('Timer operation failed:', error);
+      alert(`Failed to ${task.timerRunning ? 'stop' : 'start'} timer: ${error.response?.data?.error || error.message}`);
     } finally { setLoading(false); }
   };
 
