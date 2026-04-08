@@ -6,14 +6,14 @@ A complete task management and productivity tracking app built with **Next.js**,
 
 ## Features
 
-- ✅ **Task Management** — Create, edit, delete tasks with title, description, priority, labels, due date
-- 📁 **Projects** — Organize tasks into color-coded projects with progress tracking
+- **Task Management** — Create, edit, delete tasks with title, description, priority, labels, due date
+- **Projects** — Organize tasks into color-coded projects with progress tracking
 - ⏱ **Time Tracking** — Built-in per-task timer with live elapsed display
-- 📊 **Dashboard** — Real-time overview: total/completed/in-progress/pending counts
-- 📈 **Analytics** — 30-day trends, priority breakdown, label usage, time by project
-- 🕐 **History** — Full task log grouped by date with timestamps
-- 🔍 **Filters** — Search, filter by status/priority/project, sort multiple ways
-- 🎯 **Productivity Insights** — Completion rate, weekly average, best day, average time/task
+- **Dashboard** — Real-time overview: total/completed/in-progress/pending counts
+- **Analytics** — 30-day trends, priority breakdown, label usage, time by project
+- **History** — Full task log grouped by date with timestamps
+- **Filters** — Search, filter by status/priority/project, sort multiple ways
+- **Productivity Insights** — Completion rate, weekly average, best day, average time/task
 
 ---
 
