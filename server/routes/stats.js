@@ -39,11 +39,16 @@ router.get('/daily', async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 14;
     const result = [];
+    
+    // Get current local date
     const now = new Date();
+    const localOffset = now.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localToday = new Date(now.getTime() - localOffset);
+    localToday.setHours(0, 0, 0, 0);
 
-    for (let i = days - 1; i >= 0; i--) {
-      const dayStart = new Date(now);
-      dayStart.setDate(now.getDate() - i);
+    for (let i = 0; i < days; i++) {
+      const dayStart = new Date(localToday);
+      dayStart.setDate(localToday.getDate() - i);
       dayStart.setHours(0, 0, 0, 0);
 
       const dayEnd = new Date(dayStart);
@@ -57,14 +62,20 @@ router.get('/daily', async (req, res) => {
         createdAt: { $gte: dayStart, $lte: dayEnd }
       });
 
+      // Format date in local timezone
+      const dateStr = dayStart.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+      const label = dayStart.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' });
+
       result.push({
-        date: dayStart.toISOString().split('T')[0],
-        label: dayStart.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' }),
+        date: dateStr,
+        label: label,
         completed,
         created
       });
     }
 
+    // Reverse to show oldest first, newest last
+    result.reverse();
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
