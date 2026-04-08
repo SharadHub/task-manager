@@ -1,9 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getProjects, createProject, deleteProject } from '../lib/api';
 import { PROJECT_COLORS, PROJECT_ICONS } from '../lib/utils';
 
-export default function ProjectsView({ onNav }) {
+export default function ProjectsView() {
+  const router = useRouter();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -142,7 +144,7 @@ export default function ProjectsView({ onNav }) {
                     {p.completedCount}/{p.taskCount} tasks · {Math.round(pct)}%
                   </span>
                   <button
-                    onClick={() => onNav('tasks', { project: p._id })}
+                    onClick={() => router.push(`/tasks?project=${p._id}`)}
                     style={{
                       background: `${p.color}18`, border: `1px solid ${p.color}33`,
                       color: p.color, borderRadius: 6, padding: '3px 8px',
