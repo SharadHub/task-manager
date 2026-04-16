@@ -57,21 +57,21 @@ export default function Dashboard({ onNav }) {
     ? Math.round((overview.completed / overview.total) * 100) : 0;
 
   return (
-    <div style={{ padding: '28px 32px', flex: 1, overflow: 'auto' }}>
-      <div style={{ marginBottom: 28 }}>
+    <div style={{ padding: '16px', flex: 1, overflow: 'auto' }}>
+      <div style={{ marginBottom: 20 }}>
         <h1 style={{
-          fontFamily: 'var(--font-display)', fontSize: 28,
+          fontFamily: 'var(--font-display)', fontSize: 24,
           color: 'var(--text)', marginBottom: 4
         }}>Dashboard</h1>
-        <p style={{ fontSize: 13, color: 'var(--text-3)' }}>
+        <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
           Your productivity at a glance
         </p>
       </div>
 
       {/* Overview cards */}
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
-        gap: 14, marginBottom: 28,
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+        gap: 12, marginBottom: 20,
       }}>
         <StatCard label="TOTAL TASKS" value={overview?.total} icon="≡" color="var(--accent)" />
         <StatCard label="COMPLETED" value={overview?.completed} icon="✓" color="var(--green)" />
@@ -94,17 +94,17 @@ export default function Dashboard({ onNav }) {
       </div>
 
       {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, marginBottom: 20 }}>
         {/* Daily chart */}
         <div style={{
           background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 12, padding: 20,
+          borderRadius: 12, padding: 16,
         }}>
           <div style={{
             fontSize: 12, color: 'var(--text-3)', marginBottom: 16,
             fontFamily: 'var(--font-mono)', letterSpacing: '0.05em'
           }}>14-DAY COMPLETION TREND</div>
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={140}>
             <AreaChart data={daily} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
@@ -128,16 +128,18 @@ export default function Dashboard({ onNav }) {
             </AreaChart>
           </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* Priority breakdown */}
+      {/* Priority breakdown */}
+      <div style={{
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: 12, padding: 16,
+        marginBottom: 20,
+      }}>
         <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 12, padding: 20,
-        }}>
-          <div style={{
-            fontSize: 12, color: 'var(--text-3)', marginBottom: 16,
-            fontFamily: 'var(--font-mono)', letterSpacing: '0.05em'
-          }}>PRIORITY BREAKDOWN</div>
+          fontSize: 12, color: 'var(--text-3)', marginBottom: 12,
+          fontFamily: 'var(--font-mono)', letterSpacing: '0.05em'
+        }}>PRIORITY BREAKDOWN</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {priority.map(p => (
               <div key={p.priority}>
@@ -190,10 +192,10 @@ export default function Dashboard({ onNav }) {
       {/* Recent activity */}
       <div style={{
         background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 12, padding: 20,
+        borderRadius: 12, padding: 16,
       }}>
         <div style={{
-          fontSize: 12, color: 'var(--text-3)', marginBottom: 16,
+          fontSize: 12, color: 'var(--text-3)', marginBottom: 12,
           fontFamily: 'var(--font-mono)', letterSpacing: '0.05em',
           display: 'flex', justifyContent: 'space-between',
         }}>

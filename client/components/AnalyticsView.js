@@ -65,33 +65,83 @@ export default function AnalyticsView() {
   const bestDay = [...daily30].sort((a, b) => b.completed - a.completed)[0];
 
   return (
-    <div style={{ padding: '28px 32px', flex: 1, overflow: 'auto' }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--text)', marginBottom: 4 }}>
+    <div style={{ 
+      padding: 'var(--spacing-md)', 
+      flex: 1, 
+      overflow: 'auto',
+      maxWidth: '100%'
+    }}>
+      <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+        <h1 className="heading-responsive" style={{ 
+          fontFamily: 'var(--font-display)', 
+          color: 'var(--text)', 
+          marginBottom: 'var(--spacing-xs)',
+          lineHeight: '1.3'
+        }}>
           Analytics
         </h1>
-        <p style={{ fontSize: 13, color: 'var(--text-3)' }}>Performance insights and productivity trends</p>
+        <p style={{ 
+          fontSize: 'var(--font-sm)', 
+          color: 'var(--text-3)',
+          lineHeight: '1.5'
+        }}>Performance insights and productivity trends</p>
       </div>
 
       {/* KPI row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="analytics-kpi-grid" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(4, 1fr)', 
+        gap: 'var(--spacing-md)', 
+        marginBottom: 'var(--spacing-lg)'
+      }}>
         {[
           { label: 'TOTAL TIME TRACKED', value: formatTime(overview?.totalTime), icon: '⏱', color: 'var(--accent)' },
           { label: 'AVG TIME / TASK', value: formatTime(overview?.avgTime), icon: '◷', color: 'var(--blue)' },
           { label: 'WEEKLY AVG', value: `${weeklyAvg}/day`, icon: '📈', color: 'var(--green)' },
           { label: 'BEST DAY', value: bestDay ? `${bestDay.completed} tasks` : '—', icon: '🏆', color: 'var(--amber)' },
         ].map(k => (
-          <div key={k.label} style={{
-            background: 'var(--surface)', border: '1px solid var(--border)',
-            borderRadius: 12, padding: '16px 18px', position: 'relative', overflow: 'hidden',
+          <div key={k.label} className="kpi-card" style={{
+            background: 'var(--surface)', 
+            border: '1px solid var(--border)',
+            borderRadius: 12, 
+            padding: 'var(--spacing-md)', 
+            position: 'relative', 
+            overflow: 'hidden',
+            wordBreak: 'break-word'
           }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: k.color }} />
-            <div style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', marginBottom: 8 }}>
+            <div style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              height: 2, 
+              background: k.color 
+            }} />
+            <div style={{ 
+              fontSize: 10, 
+              color: 'var(--text-3)', 
+              fontFamily: 'var(--font-mono)', 
+              letterSpacing: '0.08em', 
+              marginBottom: 'var(--spacing-sm)',
+              lineHeight: '1.4'
+            }}>
               {k.label}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="kpi-value" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 'var(--spacing-sm)',
+              flexWrap: 'wrap'
+            }}>
               <span style={{ fontSize: 22 }}>{k.icon}</span>
-              <span style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--text)' }}>
+              <span style={{ 
+                fontSize: 22, 
+                fontWeight: 700, 
+                fontFamily: 'var(--font-display)', 
+                color: 'var(--text)',
+                wordBreak: 'break-word',
+                lineHeight: '1.2'
+              }}>
                 {k.value}
               </span>
             </div>
@@ -100,11 +150,23 @@ export default function AnalyticsView() {
       </div>
 
       {/* 30-day bar chart */}
-      <div style={{
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 12, padding: 20, marginBottom: 20,
+      <div className="analytics-chart" style={{
+        background: 'var(--surface)', 
+        border: '1px solid var(--border)',
+        borderRadius: 12, 
+        padding: 'var(--spacing-lg)', 
+        marginBottom: 'var(--spacing-lg)',
+        maxWidth: '100%',
+        overflow: 'hidden'
       }}>
-        <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
+        <div style={{ 
+          fontSize: 12, 
+          color: 'var(--text-3)', 
+          marginBottom: 'var(--spacing-md)', 
+          fontFamily: 'var(--font-mono)', 
+          letterSpacing: '0.05em',
+          textAlign: 'center'
+        }}>
           30-DAY COMPLETION HISTORY
         </div>
         <ResponsiveContainer width="100%" height={200}>
@@ -125,10 +187,28 @@ export default function AnalyticsView() {
       </div>
 
       {/* Bottom row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+      <div className="analytics-bottom-row" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '1fr 1fr 1fr', 
+        gap: 'var(--spacing-md)',
+        maxWidth: '100%'
+      }}>
         {/* Priority pie */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 20 }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 12, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
+        <div className="analytics-card" style={{ 
+          background: 'var(--surface)', 
+          border: '1px solid var(--border)', 
+          borderRadius: 12, 
+          padding: 'var(--spacing-lg)',
+          maxWidth: '100%'
+        }}>
+          <div style={{ 
+            fontSize: 12, 
+            color: 'var(--text-3)', 
+            marginBottom: 'var(--spacing-md)', 
+            fontFamily: 'var(--font-mono)', 
+            letterSpacing: '0.05em',
+            textAlign: 'center'
+          }}>
             TASK DISTRIBUTION
           </div>
           {pieData.length > 0 ? (
@@ -143,32 +223,78 @@ export default function AnalyticsView() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', fontSize: 13 }}>
-              No data
-            </div>
+            <div style={{ 
+              height: 180, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              color: 'var(--text-3)', 
+              fontSize: 'var(--font-sm)',
+              textAlign: 'center'
+            }}>No data</div>
           )}
         </div>
 
         {/* Labels */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 20 }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 12, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
+        <div className="analytics-card" style={{ 
+          background: 'var(--surface)', 
+          border: '1px solid var(--border)', 
+          borderRadius: 12, 
+          padding: 'var(--spacing-lg)',
+          maxWidth: '100%'
+        }}>
+          <div style={{ 
+            fontSize: 12, 
+            color: 'var(--text-3)', 
+            marginBottom: 'var(--spacing-md)', 
+            fontFamily: 'var(--font-mono)', 
+            letterSpacing: '0.05em',
+            textAlign: 'center'
+          }}>
             TOP LABELS
           </div>
           {labels.length === 0 ? (
-            <div style={{ color: 'var(--text-3)', fontSize: 13 }}>No labels used</div>
+            <div style={{ 
+              color: 'var(--text-3)', 
+              fontSize: 'var(--font-sm)',
+              textAlign: 'center',
+              padding: 'var(--spacing-md)'
+            }}>No labels used</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               {labels.slice(0, 8).map((l, i) => {
                 const maxCount = labels[0]?.count || 1;
                 return (
                   <div key={l.label}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-2)' }}>#{l.label}</span>
-                      <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--font-mono)' }}>{l.count}</span>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      marginBottom: 'var(--spacing-xs)',
+                      alignItems: 'center'
+                    }}>
+                      <span style={{ 
+                        fontSize: 12, 
+                        color: 'var(--text-2)',
+                        wordBreak: 'break-word',
+                        flex: 1,
+                        marginRight: 'var(--spacing-xs)'
+                      }}>#{l.label}</span>
+                      <span style={{ 
+                        fontSize: 11, 
+                        color: 'var(--text-3)', 
+                        fontFamily: 'var(--font-mono)',
+                        flexShrink: 0
+                      }}>{l.count}</span>
                     </div>
-                    <div style={{ height: 4, background: 'var(--bg-3)', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ 
+                      height: 4, 
+                      background: 'var(--bg-3)', 
+                      borderRadius: 2, 
+                      overflow: 'hidden' 
+                    }}>
                       <div style={{
-                        height: '100%', borderRadius: 2,
+                        height: '100%', 
+                        borderRadius: 2,
                         width: `${(l.count / maxCount) * 100}%`,
                         background: `hsl(${(i * 37 + 220) % 360}, 65%, 60%)`,
                       }} />
@@ -181,29 +307,71 @@ export default function AnalyticsView() {
         </div>
 
         {/* Time by project */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 20 }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 12, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
+        <div className="analytics-card" style={{ 
+          background: 'var(--surface)', 
+          border: '1px solid var(--border)', 
+          borderRadius: 12, 
+          padding: 'var(--spacing-lg)',
+          maxWidth: '100%'
+        }}>
+          <div style={{ 
+            fontSize: 12, 
+            color: 'var(--text-3)', 
+            marginBottom: 'var(--spacing-md)', 
+            fontFamily: 'var(--font-mono)', 
+            letterSpacing: '0.05em',
+            textAlign: 'center'
+          }}>
             TIME BY PROJECT
           </div>
           {timeByProject.length === 0 ? (
-            <div style={{ color: 'var(--text-3)', fontSize: 13 }}>No time tracked</div>
+            <div style={{ 
+              color: 'var(--text-3)', 
+              fontSize: 'var(--font-sm)',
+              textAlign: 'center',
+              padding: 'var(--spacing-md)'
+            }}>No time tracked</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               {timeByProject.map((t, i) => {
                 const maxTime = timeByProject[0]?.totalTime || 1;
                 return (
                   <div key={t._id}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-2)' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      marginBottom: 'var(--spacing-xs)',
+                      flexWrap: 'wrap',
+                      gap: 'var(--spacing-xs)'
+                    }}>
+                      <span style={{ 
+                        fontSize: 12, 
+                        color: 'var(--text-2)',
+                        wordBreak: 'break-word',
+                        flex: 1
+                      }}>
                         {t.project.icon} {t.project.name}
                       </span>
-                      <span style={{ fontSize: 11, color: t.project.color, fontFamily: 'var(--font-mono)' }}>
+                      <span style={{ 
+                        fontSize: 11, 
+                        color: t.project.color, 
+                        fontFamily: 'var(--font-mono)',
+                        flexShrink: 0
+                      }}>
                         {formatTime(t.totalTime)}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: 'var(--bg-3)', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ 
+                      height: 4, 
+                      background: 'var(--bg-3)', 
+                      borderRadius: 2, 
+                      overflow: 'hidden' 
+                    }}>
                       <div style={{
-                        height: '100%', borderRadius: 2, background: t.project.color,
+                        height: '100%', 
+                        borderRadius: 2, 
+                        background: t.project.color,
                         width: `${(t.totalTime / maxTime) * 100}%`,
                       }} />
                     </div>

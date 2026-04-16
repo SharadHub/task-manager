@@ -2,15 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Task = require('../models/Task');
 const mongoose = require('mongoose');
+const auth = require('../middleware/auth');
 
 // Helper function to validate ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // GET all tasks with filters
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const { status, priority, project, label, search } = req.query;
-    const query = {};
+    const query = { user: req.user._id };
     if (status) query.status = status;
     if (priority) query.priority = priority;
     if (project) query.project = project;
@@ -27,13 +28,13 @@ router.get('/', async (req, res) => {
 });
 
 // GET single task
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ error: 'Invalid task ID format' });
     }
     
-    const task = await Task.findById(req.params.id).populate('project', 'name color icon');
+    const task = await Task.findOne({ _id: req.params.id, user: req.user._id }).populate('project', 'name color icon');
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json(task);
   } catch (err) {
@@ -42,9 +43,9 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE task
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
-    const task = new Task(req.body);
+    const task = new Task({ ...req.body, user: req.user._id });
     await task.save();
     await task.populate('project', 'name color icon');
     res.status(201).json(task);
@@ -54,7 +55,7 @@ router.post('/', async (req, res) => {
 });
 
 // UPDATE task
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ error: 'Invalid task ID format' });
@@ -64,13 +65,15 @@ router.put('/:id', async (req, res) => {
 
     // Handle status transitions
     if (req.body.status === 'in_progress') {
-      const task = await Task.findById(req.params.id);
+      const task = await Task.findOne({ _id: req.params.id, user: req.user._id });
+      if (!task) return res.status(404).json({ error: 'Task not found' });
       if (!task.startedAt) update.startedAt = new Date();
     }
     if (req.body.status === 'completed') {
       update.completedAt = new Date();
       // Stop timer if running
-      const task = await Task.findById(req.params.id);
+      const task = await Task.findOne({ _id: req.params.id, user: req.user._id });
+      if (!task) return res.status(404).json({ error: 'Task not found' });
       if (task.timerRunning && task.timerStartedAt) {
         const elapsed = Math.floor((new Date() - task.timerStartedAt) / 1000);
         update.timeSpent = (task.timeSpent || 0) + elapsed;
@@ -79,8 +82,11 @@ router.put('/:id', async (req, res) => {
       }
     }
 
-    const task = await Task.findByIdAndUpdate(req.params.id, update, { new: true })
-      .populate('project', 'name color icon');
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      update,
+      { new: true }
+    ).populate('project', 'name color icon');
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json(task);
   } catch (err) {
@@ -89,14 +95,14 @@ router.put('/:id', async (req, res) => {
 });
 
 // START timer
-router.post('/:id/timer/start', async (req, res) => {
+router.post('/:id/timer/start', auth, async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ error: 'Invalid task ID format' });
     }
 
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
       {
         timerRunning: true,
         timerStartedAt: new Date(),
@@ -117,21 +123,21 @@ router.post('/:id/timer/start', async (req, res) => {
 });
 
 // STOP timer
-router.post('/:id/timer/stop', async (req, res) => {
+router.post('/:id/timer/stop', auth, async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ error: 'Invalid task ID format' });
     }
 
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({ _id: req.params.id, user: req.user._id });
     if (!task) return res.status(404).json({ error: 'Task not found' });
 
     const elapsed = task.timerStartedAt
       ? Math.floor((new Date() - task.timerStartedAt) / 1000)
       : 0;
 
-    const updated = await Task.findByIdAndUpdate(
-      req.params.id,
+    const updated = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
       {
         timerRunning: false,
         timerStartedAt: null,
@@ -146,13 +152,13 @@ router.post('/:id/timer/stop', async (req, res) => {
 });
 
 // DELETE task
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ error: 'Invalid task ID format' });
     }
     
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user._id });
     if (!task) return res.status(404).json({ error: 'Task not found' });
     
     res.json({ message: 'Task deleted' });

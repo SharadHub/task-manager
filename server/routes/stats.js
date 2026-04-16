@@ -1,24 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const Task = require('../models/Task');
+const auth = require('../middleware/auth');
 
-router.get('/overview', async (req, res) => {
+router.get('/overview', auth, async (req, res) => {
   try {
-    const total = await Task.countDocuments();
-    const completed = await Task.countDocuments({ status: 'completed' });
-    const inProgress = await Task.countDocuments({ status: 'in_progress' });
-    const pending = await Task.countDocuments({ status: 'pending' });
-    const archived = await Task.countDocuments({ status: 'archived' });
+    const total = await Task.countDocuments({ user: req.user._id });
+    const completed = await Task.countDocuments({ status: 'completed', user: req.user._id });
+    const inProgress = await Task.countDocuments({ status: 'in_progress', user: req.user._id });
+    const pending = await Task.countDocuments({ status: 'pending', user: req.user._id });
+    const archived = await Task.countDocuments({ status: 'archived', user: req.user._id });
 
     // Total time spent (including running timers)
-    const tasks = await Task.find({ timeSpent: { $gt: 0 } });
+    const tasks = await Task.find({ timeSpent: { $gt: 0 }, user: req.user._id });
     let totalTime = tasks.reduce((sum, t) => sum + (t.timeSpent || 0), 0);
 
     // Avg completion time
     const completedTasks = await Task.find({
       status: 'completed',
       startedAt: { $ne: null },
-      completedAt: { $ne: null }
+      completedAt: { $ne: null },
+      user: req.user._id
     });
     let avgTime = 0;
     if (completedTasks.length > 0) {
@@ -35,7 +37,7 @@ router.get('/overview', async (req, res) => {
 });
 
 // Daily completion trend (last 14 days)
-router.get('/daily', async (req, res) => {
+router.get('/daily', auth, async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 14;
     const result = [];
@@ -56,10 +58,12 @@ router.get('/daily', async (req, res) => {
 
       const completed = await Task.countDocuments({
         status: 'completed',
-        completedAt: { $gte: dayStart, $lte: dayEnd }
+        completedAt: { $gte: dayStart, $lte: dayEnd },
+        user: req.user._id
       });
       const created = await Task.countDocuments({
-        createdAt: { $gte: dayStart, $lte: dayEnd }
+        createdAt: { $gte: dayStart, $lte: dayEnd },
+        user: req.user._id
       });
 
       // Format date in local timezone
@@ -83,12 +87,12 @@ router.get('/daily', async (req, res) => {
 });
 
 // Priority breakdown
-router.get('/priority', async (req, res) => {
+router.get('/priority', auth, async (req, res) => {
   try {
     const priorities = ['low', 'medium', 'high', 'urgent'];
     const result = await Promise.all(priorities.map(async (p) => {
-      const total = await Task.countDocuments({ priority: p });
-      const completed = await Task.countDocuments({ priority: p, status: 'completed' });
+      const total = await Task.countDocuments({ priority: p, user: req.user._id });
+      const completed = await Task.countDocuments({ priority: p, status: 'completed', user: req.user._id });
       return { priority: p, total, completed };
     }));
     res.json(result);
@@ -98,10 +102,10 @@ router.get('/priority', async (req, res) => {
 });
 
 // Recent activity (last completed tasks)
-router.get('/recent', async (req, res) => {
+router.get('/recent', auth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const tasks = await Task.find({ status: 'completed' })
+    const tasks = await Task.find({ status: 'completed', user: req.user._id })
       .populate('project', 'name color icon')
       .sort({ completedAt: -1 })
       .limit(limit);
@@ -112,9 +116,10 @@ router.get('/recent', async (req, res) => {
 });
 
 // Labels usage
-router.get('/labels', async (req, res) => {
+router.get('/labels', auth, async (req, res) => {
   try {
     const result = await Task.aggregate([
+      { $match: { user: req.user._id } },
       { $unwind: '$labels' },
       { $group: { _id: '$labels', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
@@ -127,13 +132,14 @@ router.get('/labels', async (req, res) => {
 });
 
 // Time tracking per project
-router.get('/time-by-project', async (req, res) => {
+router.get('/time-by-project', auth, async (req, res) => {
   try {
     const result = await Task.aggregate([
-      { $match: { project: { $ne: null }, timeSpent: { $gt: 0 } } },
+      { $match: { project: { $ne: null }, timeSpent: { $gt: 0 }, user: req.user._id } },
       { $group: { _id: '$project', totalTime: { $sum: '$timeSpent' }, taskCount: { $sum: 1 } } },
       { $lookup: { from: 'projects', localField: '_id', foreignField: '_id', as: 'project' } },
       { $unwind: '$project' },
+      { $match: { 'project.user': req.user._id } },
       { $sort: { totalTime: -1 } }
     ]);
     res.json(result);

@@ -49,42 +49,58 @@ export default function TaskCard({ task, onUpdate, onDelete, compact = false }) 
   const isInProgress = task.status === 'in_progress';
 
   return (
-    <div className="task-card" style={{
+    <div className="task-card mobile-task-card" style={{
       borderRadius: 10,
-      padding: compact ? '12px 14px' : '16px',
+      padding: compact ? 'var(--spacing-sm)' : 'var(--spacing-md)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 10,
+      gap: 'var(--spacing-sm)',
       opacity: isCompleted ? 0.75 : 1,
+      maxWidth: '100%',
+      wordBreak: 'break-word',
     }}>
       {/* Top row */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+      <div className="task-top-row" style={{ 
+        display: 'flex', 
+        alignItems: 'flex-start', 
+        gap: 'var(--spacing-sm)',
+        flexWrap: 'wrap'
+      }}>
         {/* Checkbox */}
         <button
           onClick={() => handleStatus(isCompleted ? 'pending' : 'completed')}
           style={{
-            width: 18, height: 18, borderRadius: 5,
+            width: 20, height: 20, borderRadius: 5,
             border: `2px solid ${isCompleted ? 'var(--green)' : 'var(--border-2)'}`,
             background: isCompleted ? 'var(--green-dim)' : 'transparent',
             cursor: 'pointer', flexShrink: 0, marginTop: 2,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--green)', fontSize: 11, transition: 'all 0.15s',
+            color: 'var(--green)', fontSize: 12, transition: 'all 0.15s',
+            minHeight: '20px'
           }}
         >
           {isCompleted ? '✓' : ''}
         </button>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, marginRight: 'var(--spacing-xs)' }}>
           <div style={{
-            fontSize: 14, fontWeight: 500, color: 'var(--text)',
+            fontSize: 'var(--font-sm)', 
+            fontWeight: 500, 
+            color: 'var(--text)',
             textDecoration: isCompleted ? 'line-through' : 'none',
             wordBreak: 'break-word',
+            lineHeight: '1.4'
           }}>{task.title}</div>
           {task.description && !compact && (
             <div style={{
-              fontSize: 12, color: 'var(--text-3)', marginTop: 3,
-              overflow: 'hidden', display: '-webkit-box',
-              WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              fontSize: 'var(--font-xs)', 
+              color: 'var(--text-3)', 
+              marginTop: 'var(--spacing-xs)',
+              overflow: 'hidden', 
+              display: '-webkit-box',
+              WebkitLineClamp: 2, 
+              WebkitBoxOrient: 'vertical',
+              lineHeight: '1.4'
             }}>{task.description}</div>
           )}
         </div>
@@ -98,10 +114,18 @@ export default function TaskCard({ task, onUpdate, onDelete, compact = false }) 
               background: task.timerRunning ? 'rgba(239,68,68,0.12)' : 'var(--bg-3)',
               border: `1px solid ${task.timerRunning ? 'rgba(239,68,68,0.3)' : 'var(--border)'}`,
               color: task.timerRunning ? 'var(--red)' : 'var(--text-3)',
-              borderRadius: 6, padding: '4px 8px', cursor: 'pointer',
-              fontSize: 11, fontFamily: 'var(--font-mono)', flexShrink: 0,
-              display: 'flex', alignItems: 'center', gap: 4,
+              borderRadius: 6, 
+              padding: 'var(--spacing-xs) var(--spacing-sm)', 
+              cursor: 'pointer',
+              fontSize: 'var(--font-xs)', 
+              fontFamily: 'var(--font-mono)', 
+              flexShrink: 0,
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 'var(--spacing-xs)',
               transition: 'all 0.15s',
+              minHeight: '32px',
+              whiteSpace: 'nowrap'
             }}
           >
             {task.timerRunning ? (
@@ -119,15 +143,27 @@ export default function TaskCard({ task, onUpdate, onDelete, compact = false }) 
         )}
         {isCompleted && totalTime > 0 && (
           <span style={{
-            fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--font-mono)',
-            background: 'var(--bg-3)', border: '1px solid var(--border)',
-            borderRadius: 6, padding: '4px 8px', flexShrink: 0,
+            fontSize: 'var(--font-xs)', 
+            color: 'var(--text-3)', 
+            fontFamily: 'var(--font-mono)',
+            background: 'var(--bg-3)', 
+            border: '1px solid var(--border)',
+            borderRadius: 6, 
+            padding: 'var(--spacing-xs) var(--spacing-sm)', 
+            flexShrink: 0,
+            whiteSpace: 'nowrap'
           }}>⏱ {formatTime(totalTime)}</span>
         )}
       </div>
 
       {/* Badges row */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
+      <div className="task-badges" style={{ 
+        display: 'flex', 
+        flexWrap: 'wrap', 
+        gap: 'var(--spacing-xs)', 
+        alignItems: 'center',
+        lineHeight: '1.4'
+      }}>
         <span className={`badge status-${task.status}`}>{task.status.replace('_', ' ')}</span>
         <span className={`badge priority-${task.priority}`}>{task.priority}</span>
         {task.project && (
@@ -146,25 +182,44 @@ export default function TaskCard({ task, onUpdate, onDelete, compact = false }) 
           }}>#{l}</span>
         ))}
         <span style={{
-          fontSize: 11, color: 'var(--text-3)', marginLeft: 'auto',
+          fontSize: 10, 
+          color: 'var(--text-3)', 
+          marginLeft: 'auto',
           fontFamily: 'var(--font-mono)',
+          flexShrink: 0
         }}>{timeAgo(task.createdAt)}</span>
       </div>
 
       {/* Status change bar */}
       {!compact && !isCompleted && (
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div className="task-actions" style={{ 
+          display: 'flex', 
+          gap: 'var(--spacing-xs)',
+          flexWrap: 'wrap'
+        }}>
           {['pending', 'in_progress', 'archived'].filter(s => s !== task.status).map(s => (
             <button
               key={s}
               onClick={() => handleStatus(s)}
               className="btn btn-ghost btn-sm"
-              style={{ fontSize: 11 }}
+              style={{ 
+                fontSize: 11,
+                padding: 'var(--spacing-xs) var(--spacing-sm)',
+                minHeight: '32px'
+              }}
             >
               → {s.replace('_', ' ')}
             </button>
           ))}
-          <button onClick={handleDelete} className="btn btn-danger btn-sm" style={{ marginLeft: 'auto' }}>
+          <button 
+            onClick={handleDelete} 
+            className="btn btn-danger btn-sm" 
+            style={{ 
+              marginLeft: 'auto',
+              padding: 'var(--spacing-xs) var(--spacing-sm)',
+              minHeight: '32px'
+            }}
+          >
             ✕
           </button>
         </div>

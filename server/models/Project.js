@@ -5,6 +5,7 @@ const ProjectSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   color: { type: String, default: '#6366f1' },
   icon: { type: String, default: '📁' },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now }
 });
 

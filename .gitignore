@@ -65,3 +65,6 @@ Thumbs.db
 # Misc
 *.tgz
 *.tar.gz
+
+# Scripts
+commit-all.sh

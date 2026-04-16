@@ -15,6 +15,7 @@ const TaskSchema = new mongoose.Schema({
   },
   labels: [{ type: String, trim: true }],
   project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', default: null },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   
   // Time tracking
   startedAt: { type: Date, default: null },
